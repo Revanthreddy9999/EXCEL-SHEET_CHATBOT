@@ -64,6 +64,9 @@ Python code:
 
                 # Execute code safely in local scope
                 local_vars = {'df': df, 'plt': plt, 'sns': sns, 'pd': pd, 'st': st}
+                # Clean up escaped underscores
+                result_text_clean = result_text.replace("\\_", "_").strip()
+
                 exec(result_text, {}, local_vars)
 
                 # If plot was created, show it
