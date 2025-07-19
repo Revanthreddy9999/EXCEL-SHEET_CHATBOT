@@ -5,12 +5,13 @@ import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
+import textwrap
 
-# Set Streamlit layout
+# Streamlit page setup
 st.set_page_config(page_title="Excel Chatbot", layout="wide")
 st.title("📊 Insight Sheet")
 
-# Load API key
+# Load Mistral API key from environment
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 if not MISTRAL_API_KEY:
     st.warning("Please set your Mistral API token as the 'MISTRAL_API_KEY' environment variable.")
@@ -27,20 +28,25 @@ if uploaded_file:
     user_input = st.text_input("Ask a question about your Excel data:")
 
     if user_input:
-        # Prompt to Mistral: ask for Python code only
+        # Prepare Mistral prompt
         prompt = f"""
-You are a data analyst. Given the following DataFrame (called `df`), generate only the Python code to answer the user's question.
-Do not explain the answer. Only return code.
-Do not use input() or print().
-Only use Pandas/Matplotlib/Seaborn. Assume `df` is already loaded.
+You are a data analyst. Given the following DataFrame named `df`, generate Python code to answer the user's question.
+
+Requirements:
+- ONLY return valid Python code (NO explanations or text)
+- Use pandas, matplotlib, seaborn, or Streamlit as needed
+- Assume df is already defined
+- DO NOT use print() or input()
+
 User Question: "{user_input}"
-Data Preview:
+
+Data Preview (first 5 rows):
 {df.head(5).to_markdown(index=False)}
 
 Python code:
 """
 
-        # Send request to Mistral
+        # Call Mistral API
         response = requests.post(
             "https://api.mistral.ai/v1/chat/completions",
             headers={
@@ -48,7 +54,7 @@ Python code:
                 "Content-Type": "application/json"
             },
             json={
-                "model": "mistral-small",  # better at reasoning
+                "model": "mistral-small",  # Use mistral-medium if available
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0
             }
@@ -56,33 +62,50 @@ Python code:
 
         if response.status_code == 200:
             result_text = response.json()["choices"][0]["message"]["content"]
-            st.code(result_text.strip(), language="python")
+
+            # Clean and sanitize code
+            clean_code = (
+                result_text
+                .replace("\\_", "_")           # Remove markdown escaped underscores
+                .replace("```python", "")
+                .replace("```", "")
+                .strip()
+            )
+            clean_code = textwrap.dedent(clean_code)  # Normalize indentation
+
+            # Show code to user
+            st.code(clean_code, language="python")
 
             try:
-                # Redirect stdout (for capturing print if needed)
-                output_buffer = io.StringIO()
+                local_vars = {
+                    'df': df,
+                    'st': st,
+                    'pd': pd,
+                    'plt': plt,
+                    'sns': sns
+                }
 
-                # Execute code safely in local scope
-                local_vars = {'df': df, 'plt': plt, 'sns': sns, 'pd': pd, 'st': st}
-                # Clean up escaped underscores
-                result_text_clean = result_text.replace("\\_", "_").strip()
+                # Simple safety check
+                unsafe_keywords = ["import os", "open(", "eval(", "exec(", "subprocess", "system"]
+                if any(keyword in clean_code for keyword in unsafe_keywords):
+                    st.error("⚠️ Unsafe code detected. Execution aborted.")
+                else:
+                    # Run the code
+                    exec(clean_code, {}, local_vars)
 
-                # Clean model artifacts
-                clean_code = result_text.replace("\\_", "_").replace("```python", "").replace("```", "").strip()
+                    # Show plot if created
+                    if plt.get_fignums():
+                        st.pyplot(plt.gcf())
+                        plt.clf()
 
-                exec(clean_code, {}, local_vars)
+                    # Show any result DataFrame created
+                    for key, val in local_vars.items():
+                        if isinstance(val, pd.DataFrame) and key != "df":
+                            st.write(f"### Result DataFrame: `{key}`")
+                            st.dataframe(val)
 
-                # If plot was created, show it
-                if plt.get_fignums():
-                    st.pyplot(plt.gcf())
-                    plt.clf()
-
-                # Show textual output if any variable was created
-                for key, val in local_vars.items():
-                    if isinstance(val, pd.DataFrame):
-                        st.write(f"### Result DataFrame: `{key}`")
-                        st.dataframe(val)
             except Exception as e:
                 st.error(f"❌ Error while executing generated code:\n{str(e)}")
+
         else:
-            st.error(f"API Error {response.status_code}: {response.text}")
+            st.error(f"❌ API Error {response.status_code}: {response.text}")
