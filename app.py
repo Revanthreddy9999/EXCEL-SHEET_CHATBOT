@@ -3,7 +3,7 @@ import pandas as pd
 
 # App Title
 st.set_page_config(page_title="Excel Chatbot", layout="wide")
-st.title("📊 Natural Excel Chatbot")
+st.title("📊 InsightSheet ")
 
 # Upload section
 uploaded_file = st.file_uploader("📁 Upload an Excel (.xlsx) file", type=["xlsx"])
