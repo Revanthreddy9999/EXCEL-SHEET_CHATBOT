@@ -67,7 +67,10 @@ Python code:
                 # Clean up escaped underscores
                 result_text_clean = result_text.replace("\\_", "_").strip()
 
-                exec(result_text, {}, local_vars)
+                # Clean model artifacts
+                clean_code = result_text.replace("\\_", "_").replace("```python", "").replace("```", "").strip()
+
+                exec(clean_code, {}, local_vars)
 
                 # If plot was created, show it
                 if plt.get_fignums():
