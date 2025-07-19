@@ -1,4 +1,4 @@
-# 📊 Natural Excel Chatbot Assistant
+# 📊 InsightSheet
 
 This project is a conversational AI assistant that allows users to upload Excel files and ask questions about their data using plain English. The assistant automatically analyzes the data and returns summaries, filters, comparisons, or charts depending on the query.
 
