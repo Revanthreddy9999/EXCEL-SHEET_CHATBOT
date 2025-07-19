@@ -1,52 +1,65 @@
-# 📊 InsightSheet
+# 📊 InsightSheet – Conversational Excel Analyzer
 
-This project is a conversational AI assistant that allows users to upload Excel files and ask questions about their data using plain English. The assistant automatically analyzes the data and returns summaries, filters, comparisons, or charts depending on the query.
+**InsightSheet** is a smart AI-powered chatbot built with Streamlit that lets you upload Excel files and interactively query your data using plain English. Whether you're looking to summarize, filter, compare, or visualize your data, InsightSheet gives you direct answers and insights — not just Python code.
 
---- 
+---
 
 ## 🚀 Features
 
-- 📁 Upload any `.xlsx` Excel file with structured data
-- 🧠 Ask questions like:
-  - "What is the average salary?"
-  - "How many employees are under 30?"
-  - "Show a chart of sales by region"
-- 📊 Returns:
-  - One-line summaries
-  - Filtered data tables
-  - Comparison results
-  - Bar, line, or histogram charts
-- ✅ Works on any schema without hardcoded column names
-- ♻️ Handles missing values, inconsistent column names, and mixed data types
+- 🗂 **Upload Excel Files** (`.xlsx`, `.xls`)
+- 💬 **Ask Questions in Plain English**, like:
+  - “What is the average age?”
+  - “How many employees are from Canada?”
+  - “Show a bar chart of sales by region”
+- 📈 **Generates Instant Insights**:
+  - One-line summaries (like max/min/average)
+  - Filtered DataFrames
+  - Grouped aggregations
+  - Visualizations (bar, histogram, etc.)
+- 🧠 **Understands Any Table Structure** — no need to know column names
+- 🛡️ **Error Resilient**: Handles missing values, filters that return nothing, and unsafe code generation
+- 🔍 Powered by the **Mistral API** for high-quality, code-generating LLM responses
 
 ---
 
 ## 🧠 Use Case
 
-Designed for NeoStats’ AI Engineer Intern challenge:
+This app was developed for the **NeoStats AI Engineer Internship Challenge**:
 
-> Build a Streamlit-based chatbot that can:
+> Build a Streamlit chatbot that can:
 > - Accept Excel uploads
 > - Analyze tabular data
-> - Answer questions in natural language
-> - Show insights as text or charts
+> - Answer natural language questions
+> - Provide insights via charts and text
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Python**
-- **Streamlit**
-- **OpenAI GPT-3.5**
-- **pandas**
-- **matplotlib**
-- **openpyxl**
+- **Python 3.8+**
+- **Streamlit** – interactive web app framework
+- **pandas** – data wrangling
+- **matplotlib** & **seaborn** – charts
+- **openpyxl** – Excel file reading
+- **Mistral API** – LLM for code generation
 
 ---
 
-## 📦 Requirements
+## 🧪 Example Questions to Try
 
-Install required packages with:
+| Question                                  | Output Type         |
+|-------------------------------------------|----------------------|
+| What is the maximum age?                  | One-line answer      |
+| Show all employees from Canada            | Filtered table       |
+| Average salary by department              | Grouped aggregation  |
+| Bar chart of sales by region              | Bar chart            |
+| Histogram of ages                         | Histogram plot       |
+
+---
+
+## 📦 Installation
+
+Install required packages:
 
 ```bash
 pip install -r requirements.txt
